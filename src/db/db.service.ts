@@ -16,7 +16,7 @@ export class DBService {
   private tracks: Track[] = [];
   private artists: Artist[] = [];
   private albums: Album[] = [];
-  private favorites: Favorites[] = [];
+  private favorites: Favorites = { artists: [], albums: [], tracks: [] };
 
   async getUsers() {
     return this.users;
@@ -85,6 +85,10 @@ export class DBService {
 
     if (!track) return DbMessages.NOT_FOUND;
 
+    this.favorites.tracks = this.favorites.tracks.filter(
+      (id) => id !== track.id,
+    );
+
     this.tracks = this.tracks.filter((track) => track.id !== trackId);
   }
 
@@ -118,6 +122,25 @@ export class DBService {
 
     if (!artist) return DbMessages.NOT_FOUND;
 
+    const tracks = await this.getTracks();
+    const albums = await this.getAlbums();
+
+    tracks.forEach((track) => {
+      if (track.artistId === artist.id) {
+        track.artistId = null;
+      }
+    });
+
+    albums.forEach((album) => {
+      if (album.artistId === artist.id) {
+        album.artistId = null;
+      }
+    });
+
+    this.favorites.artists = this.favorites.artists.filter(
+      (id) => id !== artist.id,
+    );
+
     this.artists = this.artists.filter((artist) => artist.id !== artistId);
   }
 
@@ -148,10 +171,100 @@ export class DBService {
   }
 
   async deleteAlbum(albumId: string) {
-    const artist = await this.getAlbum(albumId);
+    const album = await this.getAlbum(albumId);
+
+    if (!album) return DbMessages.NOT_FOUND;
+
+    const tracks = await this.getTracks();
+
+    tracks.forEach((track) => {
+      if (track.albumId === album.id) {
+        track.albumId = null;
+      }
+    });
+
+    this.favorites.albums = this.favorites.albums.filter(
+      (id) => id !== album.id,
+    );
+
+    this.albums = this.albums.filter((album) => album.id !== albumId);
+  }
+
+  async getFavorites() {
+    const artists = this.favorites.artists.map(
+      async (id) => await this.getArtist(id),
+    );
+    const albums = this.favorites.albums.map(
+      async (id) => await this.getAlbum(id),
+    );
+    const tracks = this.favorites.tracks.map(
+      async (id) => await this.getTrack(id),
+    );
+
+    return {
+      artists: await Promise.all(artists),
+      albums: await Promise.all(albums),
+      tracks: await Promise.all(tracks),
+    };
+  }
+
+  async addFavTrack(trackId: string) {
+    const track = await this.getTrack(trackId);
+
+    if (!track) return DbMessages.NOT_FOUND;
+
+    this.favorites.tracks.push(track.id);
+
+    return track;
+  }
+
+  async deleteFavTrack(trackId: string) {
+    const track = this.favorites.tracks.find((id) => id === trackId);
+
+    if (!track) return DbMessages.NOT_FOUND;
+
+    this.favorites.tracks = this.favorites.tracks.filter(
+      (id) => id !== trackId,
+    );
+  }
+
+  async addFavAlbum(albumId: string) {
+    const album = await this.getAlbum(albumId);
+
+    if (!album) return DbMessages.NOT_FOUND;
+
+    this.favorites.albums.push(album.id);
+
+    return album;
+  }
+
+  async deleteFavAlbum(albumId: string) {
+    const album = this.favorites.albums.find((id) => id === albumId);
+
+    if (!album) return DbMessages.NOT_FOUND;
+
+    this.favorites.albums = this.favorites.albums.filter(
+      (id) => id !== albumId,
+    );
+  }
+
+  async addFavArtist(artistId: string) {
+    const artist = await this.getArtist(artistId);
 
     if (!artist) return DbMessages.NOT_FOUND;
 
-    this.albums = this.albums.filter((album) => album.id !== albumId);
+    this.favorites.artists.push(artist.id);
+
+    return artist;
+  }
+
+  async deleteFavArtist(artistId: string) {
+    const artist = this.favorites.artists.find((id) => id === artistId);
+
+    if (!artist) return DbMessages.NOT_FOUND;
+
+    this.favorites.artists = this.favorites.artists.filter(
+      (id) => id !== artistId,
+    );
   }
 }
