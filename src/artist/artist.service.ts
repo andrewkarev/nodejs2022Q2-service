@@ -26,7 +26,7 @@ export class ArtistService {
     return await this.db.createArtist(artist);
   }
 
-  async updateArtistInfo(artistId, dto) {
+  async updateArtistInfo(artistId: string, dto: ArtistDTO) {
     const response = await this.db.updateArtistInfo(artistId, dto);
 
     if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
@@ -34,7 +34,7 @@ export class ArtistService {
     return response;
   }
 
-  async deleteArtist(artistId) {
+  async deleteArtist(artistId: string) {
     const response = await this.db.deleteArtist(artistId);
 
     if (response === DbMessages.NOT_FOUND) throw new NotFoundException();

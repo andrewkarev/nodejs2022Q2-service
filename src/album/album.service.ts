@@ -26,7 +26,7 @@ export class AlbumService {
     return await this.db.createAlbum(album);
   }
 
-  async updateAlbumInfo(albumId, dto) {
+  async updateAlbumInfo(albumId: string, dto: AlbumDTO) {
     const response = await this.db.updateAlbumInfo(albumId, dto);
 
     if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
@@ -34,7 +34,7 @@ export class AlbumService {
     return response;
   }
 
-  async deleteAlbum(albumId) {
+  async deleteAlbum(albumId: string) {
     const response = await this.db.deleteAlbum(albumId);
 
     if (response === DbMessages.NOT_FOUND) throw new NotFoundException();

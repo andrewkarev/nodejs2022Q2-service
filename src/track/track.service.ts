@@ -26,7 +26,7 @@ export class TrackService {
     return await this.db.createTrack(track);
   }
 
-  async updateTrackInfo(trackId, dto) {
+  async updateTrackInfo(trackId: string, dto: TrackDTO) {
     const response = await this.db.updateTrackInfo(trackId, dto);
 
     if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
@@ -34,7 +34,7 @@ export class TrackService {
     return response;
   }
 
-  async deleteTrack(trackId) {
+  async deleteTrack(trackId: string) {
     const response = await this.db.deleteTrack(trackId);
 
     if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
