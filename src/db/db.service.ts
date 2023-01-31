@@ -8,13 +8,14 @@ import { UpdatePasswordDto } from 'src/user/dto';
 import { TrackDTO } from 'src/track/dto';
 import { DbMessages } from 'src/common/DbMessages';
 import { ArtistDTO } from 'src/artist/dto';
+import { AlbumDTO } from 'src/album/dto';
 
 @Injectable()
 export class DBService {
   private users: User[] = [];
   private tracks: Track[] = [];
   private artists: Artist[] = [];
-  private album: Album[] = [];
+  private albums: Album[] = [];
   private favorites: Favorites[] = [];
 
   async getUsers() {
@@ -28,7 +29,7 @@ export class DBService {
   async createUser(user: User) {
     this.users.push(user);
 
-    return this.users.at(-1);
+    return user;
   }
 
   async updateUserPassword(userId: string, dto: UpdatePasswordDto) {
@@ -63,7 +64,7 @@ export class DBService {
   async createTrack(track: Track) {
     this.tracks.push(track);
 
-    return this.tracks.at(-1);
+    return track;
   }
 
   async updateTrackInfo(trackId: string, dto: TrackDTO) {
@@ -98,7 +99,7 @@ export class DBService {
   async createArtist(artist: Artist) {
     this.artists.push(artist);
 
-    return this.artists.at(-1);
+    return artist;
   }
 
   async updateArtistInfo(artistId: string, dto: ArtistDTO) {
@@ -118,5 +119,39 @@ export class DBService {
     if (!artist) return DbMessages.NOT_FOUND;
 
     this.artists = this.artists.filter((artist) => artist.id !== artistId);
+  }
+
+  async getAlbums() {
+    return this.albums;
+  }
+
+  async getAlbum(albumId: string) {
+    return this.albums.find((album) => album.id === albumId);
+  }
+
+  async createAlbum(album: Album) {
+    this.albums.push(album);
+
+    return album;
+  }
+
+  async updateAlbumInfo(albumId: string, dto: AlbumDTO) {
+    const album = await this.getAlbum(albumId);
+
+    if (!album) return DbMessages.NOT_FOUND;
+
+    album.artistId = dto.artistId;
+    album.name = dto.name;
+    album.year = dto.year;
+
+    return album;
+  }
+
+  async deleteAlbum(albumId: string) {
+    const artist = await this.getAlbum(albumId);
+
+    if (!artist) return DbMessages.NOT_FOUND;
+
+    this.albums = this.albums.filter((album) => album.id !== albumId);
   }
 }
