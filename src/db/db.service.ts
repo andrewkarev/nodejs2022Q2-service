@@ -7,6 +7,7 @@ import { Favorites } from 'src/favs/interfaces/';
 import { UpdatePasswordDto } from 'src/user/dto';
 import { TrackDTO } from 'src/track/dto';
 import { DbMessages } from 'src/common/DbMessages';
+import { ArtistDTO } from 'src/artist/dto';
 
 @Injectable()
 export class DBService {
@@ -84,5 +85,38 @@ export class DBService {
     if (!track) return DbMessages.NOT_FOUND;
 
     this.tracks = this.tracks.filter((track) => track.id !== trackId);
+  }
+
+  async getArtists() {
+    return this.artists;
+  }
+
+  async getArtist(artistId: string) {
+    return this.artists.find((artist) => artist.id === artistId);
+  }
+
+  async createArtist(artist: Artist) {
+    this.artists.push(artist);
+
+    return this.artists.at(-1);
+  }
+
+  async updateArtistInfo(artistId: string, dto: ArtistDTO) {
+    const artist = await this.getArtist(artistId);
+
+    if (!artist) return DbMessages.NOT_FOUND;
+
+    artist.grammy = dto.grammy;
+    artist.name = dto.name;
+
+    return artist;
+  }
+
+  async deleteArtist(artistId: string) {
+    const artist = await this.getArtist(artistId);
+
+    if (!artist) return DbMessages.NOT_FOUND;
+
+    this.artists = this.artists.filter((artist) => artist.id !== artistId);
   }
 }
