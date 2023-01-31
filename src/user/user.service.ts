@@ -32,7 +32,7 @@ export class UserService {
       id: uuid4(),
       login: dto.login,
       password: dto.password,
-      version: 0,
+      version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
