@@ -14,7 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const document = await readFile(join(cwd(), 'doc', 'api.yaml'), 'utf-8');
 
-  SwaggerModule.setup('api', app, parse(document));
+  SwaggerModule.setup('doc', app, parse(document));
   await app.listen(PORT);
 }
 
