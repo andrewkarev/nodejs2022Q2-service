@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/andrewkarev/nodejs2022Q2-service.git
 ```
 
 ## Installing NPM modules
@@ -16,6 +16,11 @@ git clone {repository URL}
 ```
 npm install
 ```
+
+## Prepare .env file
+
+Replace **.env.example** with **.env**
+Set up **PORT** value. Example **PORT=4000**
 
 ## Running application
 
