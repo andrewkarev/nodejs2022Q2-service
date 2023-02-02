@@ -1,44 +1,65 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DbMessages } from 'src/common/DbMessages';
-import { DBService } from 'src/db/db.service';
-import { v4 as uuid4 } from 'uuid';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { ArtistDTO } from './dto';
+import { prepareArtistResponse } from './helpers/prepareArtistResponse';
 
 @Injectable()
 export class ArtistService {
-  constructor(private db: DBService) {}
+  constructor(private prisma: PrismaService) {}
 
   async getArtists() {
-    return await this.db.getArtists();
+    const artists = await this.prisma.artist.findMany();
+
+    return prepareArtistResponse(artists);
   }
 
   async getArtist(artistId: string) {
-    const response = await this.db.getArtist(artistId);
+    const response = await this.prisma.artist.findUnique({
+      where: { id: artistId },
+    });
 
     if (!response) throw new NotFoundException();
 
-    return response;
+    return prepareArtistResponse(response);
   }
 
   async createArtist(dto: ArtistDTO) {
-    const artist = { ...dto, id: uuid4() };
+    const artist = await this.prisma.artist.create({
+      data: {
+        name: dto.name,
+        grammy: dto.grammy,
+        favorite: false,
+      },
+    });
 
-    return await this.db.createArtist(artist);
+    return prepareArtistResponse(artist);
   }
 
   async updateArtistInfo(artistId: string, dto: ArtistDTO) {
-    const response = await this.db.updateArtistInfo(artistId, dto);
+    const response = await this.prisma.artist.findUnique({
+      where: { id: artistId },
+    });
 
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
+    if (!response) throw new NotFoundException();
 
-    return response;
+    const updatedArtist = await this.prisma.artist.update({
+      where: { id: artistId },
+      data: { name: dto.name, grammy: dto.grammy },
+    });
+
+    return prepareArtistResponse(updatedArtist);
   }
 
   async deleteArtist(artistId: string) {
-    const response = await this.db.deleteArtist(artistId);
-
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
-
-    return response;
+    try {
+      await this.prisma.artist.delete({ where: { id: artistId } });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
+    }
   }
 }

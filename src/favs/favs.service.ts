@@ -3,68 +3,127 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { DbMessages } from 'src/common/DbMessages';
-import { DBService } from 'src/db/db.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { prepareAlbumResponse } from 'src/album/helpers/prepareAlbumResponse';
+import { prepareArtistResponse } from 'src/artist/helpers/prepareArtistResponse';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { prepareTrackResponse } from 'src/track/helpers/prepareTrackResponse';
 
 @Injectable()
 export class FavsService {
-  constructor(private db: DBService) {}
+  constructor(private prisma: PrismaService) {}
 
   async getFavorites() {
-    return this.db.getFavorites();
+    const artists = await this.prisma.artist.findMany({
+      where: { favorite: true },
+    });
+    const albums = await this.prisma.album.findMany({
+      where: { favorite: true },
+    });
+    const tracks = await this.prisma.track.findMany({
+      where: { favorite: true },
+    });
+
+    return {
+      artists: prepareArtistResponse(artists),
+      albums: prepareAlbumResponse(albums),
+      tracks: prepareTrackResponse(tracks),
+    };
   }
 
   async addFavTrack(trackId: string) {
-    const response = await this.db.addFavTrack(trackId);
+    try {
+      const response = await this.prisma.track.update({
+        where: { id: trackId },
+        data: { favorite: true },
+      });
 
-    if (response === DbMessages.NOT_FOUND) {
-      throw new UnprocessableEntityException();
+      return prepareTrackResponse(response);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new UnprocessableEntityException();
+        }
+      }
     }
-
-    return response;
   }
 
   async deleteFavTrack(trackId: string) {
-    const response = await this.db.deleteFavTrack(trackId);
-
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
-
-    return response;
+    try {
+      await this.prisma.track.update({
+        where: { id: trackId },
+        data: { favorite: false },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
+    }
   }
 
   async addFavAlbum(albumId: string) {
-    const response = await this.db.addFavAlbum(albumId);
+    try {
+      const response = await this.prisma.album.update({
+        where: { id: albumId },
+        data: { favorite: true },
+      });
 
-    if (response === DbMessages.NOT_FOUND) {
-      throw new UnprocessableEntityException();
+      return prepareAlbumResponse(response);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new UnprocessableEntityException();
+        }
+      }
     }
-
-    return response;
   }
 
   async deleteFavAlbum(albumId: string) {
-    const response = await this.db.deleteFavAlbum(albumId);
-
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
-
-    return response;
+    try {
+      await this.prisma.album.update({
+        where: { id: albumId },
+        data: { favorite: false },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
+    }
   }
 
   async addFavArtist(artistId: string) {
-    const response = await this.db.addFavArtist(artistId);
+    try {
+      const response = await this.prisma.artist.update({
+        where: { id: artistId },
+        data: { favorite: true },
+      });
 
-    if (response === DbMessages.NOT_FOUND) {
-      throw new UnprocessableEntityException();
+      return prepareArtistResponse(response);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new UnprocessableEntityException();
+        }
+      }
     }
-
-    return response;
   }
 
   async deleteFavArtist(artistId: string) {
-    const response = await this.db.deleteFavArtist(artistId);
-
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
-
-    return response;
+    try {
+      await this.prisma.artist.update({
+        where: { id: artistId },
+        data: { favorite: false },
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
+    }
   }
 }

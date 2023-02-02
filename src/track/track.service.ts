@@ -1,44 +1,72 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DBService } from 'src/db/db.service';
 import { TrackDTO } from './dto';
-import { v4 as uuid4 } from 'uuid';
-import { DbMessages } from 'src/common/DbMessages';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { prepareTrackResponse } from './helpers/prepareTrackResponse';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
 export class TrackService {
-  constructor(private db: DBService) {}
+  constructor(private prisma: PrismaService) {}
 
   async getTracks() {
-    return await this.db.getTracks();
+    const tracks = await this.prisma.track.findMany();
+
+    return prepareTrackResponse(tracks);
   }
 
   async getTrack(trackId: string) {
-    const response = await this.db.getTrack(trackId);
+    const response = await this.prisma.track.findUnique({
+      where: { id: trackId },
+    });
 
     if (!response) throw new NotFoundException();
 
-    return response;
+    return prepareTrackResponse(response);
   }
 
   async createTrack(dto: TrackDTO) {
-    const track = { ...dto, id: uuid4() };
+    const track = await this.prisma.track.create({
+      data: {
+        name: dto.name,
+        artistId: dto.artistId,
+        albumId: dto.albumId,
+        duration: dto.duration,
+        favorite: false,
+      },
+    });
 
-    return await this.db.createTrack(track);
+    return prepareTrackResponse(track);
   }
 
   async updateTrackInfo(trackId: string, dto: TrackDTO) {
-    const response = await this.db.updateTrackInfo(trackId, dto);
+    const response = await this.prisma.track.findUnique({
+      where: { id: trackId },
+    });
 
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
+    if (!response) throw new NotFoundException();
 
-    return response;
+    const updatedTrack = await this.prisma.track.update({
+      where: { id: trackId },
+      data: {
+        name: dto.name,
+        artistId: dto.artistId,
+        albumId: dto.albumId,
+        duration: dto.duration,
+      },
+    });
+
+    return prepareTrackResponse(updatedTrack);
   }
 
   async deleteTrack(trackId: string) {
-    const response = await this.db.deleteTrack(trackId);
-
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
-
-    return response;
+    try {
+      await this.prisma.track.delete({ where: { id: trackId } });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
+    }
   }
 }

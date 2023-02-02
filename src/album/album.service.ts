@@ -1,44 +1,66 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 as uuid4 } from 'uuid';
-import { DbMessages } from 'src/common/DbMessages';
-import { DBService } from 'src/db/db.service';
 import { AlbumDTO } from './dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { prepareAlbumResponse } from './helpers/prepareAlbumResponse';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
 export class AlbumService {
-  constructor(private db: DBService) {}
+  constructor(private prisma: PrismaService) {}
 
   async getAlbums() {
-    return await this.db.getAlbums();
+    const albums = await this.prisma.album.findMany();
+
+    return prepareAlbumResponse(albums);
   }
 
   async getAlbum(albumId: string) {
-    const response = await this.db.getAlbum(albumId);
+    const response = await this.prisma.album.findUnique({
+      where: { id: albumId },
+    });
 
     if (!response) throw new NotFoundException();
 
-    return response;
+    return prepareAlbumResponse(response);
   }
 
   async createAlbum(dto: AlbumDTO) {
-    const album = { ...dto, id: uuid4() };
+    const album = await this.prisma.album.create({
+      data: {
+        name: dto.name,
+        year: dto.year,
+        artistId: dto.artistId,
+        favorite: false,
+      },
+    });
 
-    return await this.db.createAlbum(album);
+    return prepareAlbumResponse(album);
   }
 
   async updateAlbumInfo(albumId: string, dto: AlbumDTO) {
-    const response = await this.db.updateAlbumInfo(albumId, dto);
+    const response = await this.prisma.album.findUnique({
+      where: { id: albumId },
+    });
 
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
+    if (!response) throw new NotFoundException();
 
-    return response;
+    const updatedArtist = await this.prisma.album.update({
+      where: { id: albumId },
+      data: { name: dto.name, year: dto.year, artistId: dto.artistId },
+    });
+
+    return prepareAlbumResponse(updatedArtist);
   }
 
   async deleteAlbum(albumId: string) {
-    const response = await this.db.deleteAlbum(albumId);
-
-    if (response === DbMessages.NOT_FOUND) throw new NotFoundException();
-
-    return response;
+    try {
+      await this.prisma.album.delete({ where: { id: albumId } });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
+    }
   }
 }
