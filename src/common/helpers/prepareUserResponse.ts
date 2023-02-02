@@ -1,6 +1,7 @@
 import { User } from '@prisma/client';
+import { IUserData } from '../interfaces/IUserData';
 
-class UserData {
+class UserData implements IUserData {
   public id: string;
   public login: string;
   public version: number;

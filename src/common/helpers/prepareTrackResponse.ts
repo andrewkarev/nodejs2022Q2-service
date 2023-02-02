@@ -1,6 +1,7 @@
 import { Track } from '@prisma/client';
+import { ITrackData } from '../interfaces/ITrackData';
 
-class TrackData {
+class TrackData implements ITrackData {
   public id: string;
   public name: string;
   public artistId: string | null;

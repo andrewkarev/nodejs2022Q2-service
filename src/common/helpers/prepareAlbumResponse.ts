@@ -1,6 +1,7 @@
 import { Album } from '@prisma/client';
+import { IAlbumData } from '../interfaces/IAlbumData';
 
-class AlbumData {
+class AlbumData implements IAlbumData {
   public id: string;
   public name: string;
   public year: number;

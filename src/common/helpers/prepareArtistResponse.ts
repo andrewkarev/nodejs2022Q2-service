@@ -1,6 +1,7 @@
 import { Artist } from '@prisma/client';
+import { IArtistData } from '../interfaces/IArtistData';
 
-class ArtistData {
+class ArtistData implements IArtistData {
   public id: string;
   public name: string;
   public grammy: boolean;
