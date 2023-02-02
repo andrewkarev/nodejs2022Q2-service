@@ -11,6 +11,7 @@ import { prepareTrackResponse } from 'src/common/helpers/prepareTrackResponse';
 import { ITrackData } from 'src/common/interfaces/ITrackData';
 import { IAlbumData } from 'src/common/interfaces/IAlbumData';
 import { IArtistData } from 'src/common/interfaces/IArtistData';
+import { PRISMA_ERROR } from 'src/common/constants';
 
 @Injectable()
 export class FavsService {
@@ -48,7 +49,7 @@ export class FavsService {
       return prepareTrackResponse(response);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new UnprocessableEntityException();
         }
       }
@@ -63,7 +64,7 @@ export class FavsService {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new NotFoundException();
         }
       }
@@ -80,7 +81,7 @@ export class FavsService {
       return prepareAlbumResponse(response);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new UnprocessableEntityException();
         }
       }
@@ -95,7 +96,7 @@ export class FavsService {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new NotFoundException();
         }
       }
@@ -112,7 +113,7 @@ export class FavsService {
       return prepareArtistResponse(response);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new UnprocessableEntityException();
         }
       }
@@ -127,7 +128,7 @@ export class FavsService {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new NotFoundException();
         }
       }

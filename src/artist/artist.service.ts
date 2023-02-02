@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { ArtistDTO } from './dto';
 import { prepareArtistResponse } from '../common/helpers/prepareArtistResponse';
 import { IArtistData } from 'src/common/interfaces/IArtistData';
+import { PRISMA_ERROR } from 'src/common/constants';
 
 @Injectable()
 export class ArtistService {
@@ -60,7 +61,7 @@ export class ArtistService {
       await this.prisma.artist.delete({ where: { id: artistId } });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new NotFoundException();
         }
       }

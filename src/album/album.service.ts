@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { prepareAlbumResponse } from '../common/helpers/prepareAlbumResponse';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { IAlbumData } from 'src/common/interfaces/IAlbumData';
+import { PRISMA_ERROR } from 'src/common/constants';
 
 @Injectable()
 export class AlbumService {
@@ -61,7 +62,7 @@ export class AlbumService {
       await this.prisma.album.delete({ where: { id: albumId } });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new NotFoundException();
         }
       }

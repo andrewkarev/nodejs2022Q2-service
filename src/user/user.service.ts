@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { prepareUserResponse } from '../common/helpers/prepareUserResponse';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { IUserData } from 'src/common/interfaces/IUserData';
+import { PRISMA_ERROR } from 'src/common/constants';
 
 @Injectable()
 export class UserService {
@@ -65,7 +66,7 @@ export class UserService {
       await this.prisma.user.delete({ where: { id: userId } });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new NotFoundException();
         }
       }

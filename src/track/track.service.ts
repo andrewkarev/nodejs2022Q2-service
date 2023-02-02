@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { prepareTrackResponse } from '../common/helpers/prepareTrackResponse';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { ITrackData } from 'src/common/interfaces/ITrackData';
+import { PRISMA_ERROR } from 'src/common/constants';
 
 @Injectable()
 export class TrackService {
@@ -67,7 +68,7 @@ export class TrackService {
       await this.prisma.track.delete({ where: { id: trackId } });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PRISMA_ERROR) {
           throw new NotFoundException();
         }
       }
