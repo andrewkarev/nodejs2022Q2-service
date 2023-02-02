@@ -1,20 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TrackDTO } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { prepareTrackResponse } from './helpers/prepareTrackResponse';
+import { prepareTrackResponse } from '../common/helpers/prepareTrackResponse';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { ITrackData } from 'src/common/interfaces/ITrackData';
 
 @Injectable()
 export class TrackService {
   constructor(private prisma: PrismaService) {}
 
-  async getTracks() {
+  async getTracks(): Promise<ITrackData | ITrackData[]> {
     const tracks = await this.prisma.track.findMany();
 
     return prepareTrackResponse(tracks);
   }
 
-  async getTrack(trackId: string) {
+  async getTrack(trackId: string): Promise<ITrackData | ITrackData[]> {
     const response = await this.prisma.track.findUnique({
       where: { id: trackId },
     });
@@ -24,7 +25,7 @@ export class TrackService {
     return prepareTrackResponse(response);
   }
 
-  async createTrack(dto: TrackDTO) {
+  async createTrack(dto: TrackDTO): Promise<ITrackData | ITrackData[]> {
     const track = await this.prisma.track.create({
       data: {
         name: dto.name,
@@ -38,7 +39,10 @@ export class TrackService {
     return prepareTrackResponse(track);
   }
 
-  async updateTrackInfo(trackId: string, dto: TrackDTO) {
+  async updateTrackInfo(
+    trackId: string,
+    dto: TrackDTO,
+  ): Promise<ITrackData | ITrackData[]> {
     const response = await this.prisma.track.findUnique({
       where: { id: trackId },
     });

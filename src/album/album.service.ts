@@ -1,20 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AlbumDTO } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { prepareAlbumResponse } from './helpers/prepareAlbumResponse';
+import { prepareAlbumResponse } from '../common/helpers/prepareAlbumResponse';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { IAlbumData } from 'src/common/interfaces/IAlbumData';
 
 @Injectable()
 export class AlbumService {
   constructor(private prisma: PrismaService) {}
 
-  async getAlbums() {
+  async getAlbums(): Promise<IAlbumData | IAlbumData[]> {
     const albums = await this.prisma.album.findMany();
 
     return prepareAlbumResponse(albums);
   }
 
-  async getAlbum(albumId: string) {
+  async getAlbum(albumId: string): Promise<IAlbumData | IAlbumData[]> {
     const response = await this.prisma.album.findUnique({
       where: { id: albumId },
     });
@@ -24,7 +25,7 @@ export class AlbumService {
     return prepareAlbumResponse(response);
   }
 
-  async createAlbum(dto: AlbumDTO) {
+  async createAlbum(dto: AlbumDTO): Promise<IAlbumData | IAlbumData[]> {
     const album = await this.prisma.album.create({
       data: {
         name: dto.name,
@@ -37,7 +38,10 @@ export class AlbumService {
     return prepareAlbumResponse(album);
   }
 
-  async updateAlbumInfo(albumId: string, dto: AlbumDTO) {
+  async updateAlbumInfo(
+    albumId: string,
+    dto: AlbumDTO,
+  ): Promise<IAlbumData | IAlbumData[]> {
     const response = await this.prisma.album.findUnique({
       where: { id: albumId },
     });

@@ -4,16 +4,23 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { prepareAlbumResponse } from 'src/album/helpers/prepareAlbumResponse';
-import { prepareArtistResponse } from 'src/artist/helpers/prepareArtistResponse';
+import { prepareAlbumResponse } from 'src/common/helpers/prepareAlbumResponse';
+import { prepareArtistResponse } from 'src/common/helpers/prepareArtistResponse';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { prepareTrackResponse } from 'src/track/helpers/prepareTrackResponse';
+import { prepareTrackResponse } from 'src/common/helpers/prepareTrackResponse';
+import { ITrackData } from 'src/common/interfaces/ITrackData';
+import { IAlbumData } from 'src/common/interfaces/IAlbumData';
+import { IArtistData } from 'src/common/interfaces/IArtistData';
 
 @Injectable()
 export class FavsService {
   constructor(private prisma: PrismaService) {}
 
-  async getFavorites() {
+  async getFavorites(): Promise<{
+    artists: IArtistData | IArtistData[];
+    albums: IAlbumData | IAlbumData[];
+    tracks: ITrackData | ITrackData[];
+  }> {
     const artists = await this.prisma.artist.findMany({
       where: { favorite: true },
     });
@@ -31,7 +38,7 @@ export class FavsService {
     };
   }
 
-  async addFavTrack(trackId: string) {
+  async addFavTrack(trackId: string): Promise<ITrackData | ITrackData[]> {
     try {
       const response = await this.prisma.track.update({
         where: { id: trackId },
@@ -63,7 +70,7 @@ export class FavsService {
     }
   }
 
-  async addFavAlbum(albumId: string) {
+  async addFavAlbum(albumId: string): Promise<IAlbumData | IAlbumData[]> {
     try {
       const response = await this.prisma.album.update({
         where: { id: albumId },
@@ -95,7 +102,7 @@ export class FavsService {
     }
   }
 
-  async addFavArtist(artistId: string) {
+  async addFavArtist(artistId: string): Promise<IArtistData | IArtistData[]> {
     try {
       const response = await this.prisma.artist.update({
         where: { id: artistId },

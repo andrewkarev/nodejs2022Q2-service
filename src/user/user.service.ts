@@ -5,20 +5,21 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto, UpdatePasswordDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { prepareUserResponse } from './helpers/prepareUserResponse';
+import { prepareUserResponse } from '../common/helpers/prepareUserResponse';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { IUserData } from 'src/common/interfaces/IUserData';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async getUsers() {
+  async getUsers(): Promise<IUserData | IUserData[]> {
     const users = await this.prisma.user.findMany();
 
     return prepareUserResponse(users);
   }
 
-  async getUser(userId: string) {
+  async getUser(userId: string): Promise<IUserData | IUserData[]> {
     const response = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -28,7 +29,7 @@ export class UserService {
     return prepareUserResponse(response);
   }
 
-  async createUser(dto: CreateUserDto) {
+  async createUser(dto: CreateUserDto): Promise<IUserData | IUserData[]> {
     const user = await this.prisma.user.create({
       data: {
         login: dto.login,
@@ -40,7 +41,10 @@ export class UserService {
     return prepareUserResponse(user);
   }
 
-  async updateUserPassword(userId: string, dto: UpdatePasswordDto) {
+  async updateUserPassword(
+    userId: string,
+    dto: UpdatePasswordDto,
+  ): Promise<IUserData | IUserData[]> {
     const response = await this.prisma.user.findUnique({
       where: { id: userId },
     });

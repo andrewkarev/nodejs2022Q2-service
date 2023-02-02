@@ -2,19 +2,20 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ArtistDTO } from './dto';
-import { prepareArtistResponse } from './helpers/prepareArtistResponse';
+import { prepareArtistResponse } from '../common/helpers/prepareArtistResponse';
+import { IArtistData } from 'src/common/interfaces/IArtistData';
 
 @Injectable()
 export class ArtistService {
   constructor(private prisma: PrismaService) {}
 
-  async getArtists() {
+  async getArtists(): Promise<IArtistData | IArtistData[]> {
     const artists = await this.prisma.artist.findMany();
 
     return prepareArtistResponse(artists);
   }
 
-  async getArtist(artistId: string) {
+  async getArtist(artistId: string): Promise<IArtistData | IArtistData[]> {
     const response = await this.prisma.artist.findUnique({
       where: { id: artistId },
     });
@@ -24,7 +25,7 @@ export class ArtistService {
     return prepareArtistResponse(response);
   }
 
-  async createArtist(dto: ArtistDTO) {
+  async createArtist(dto: ArtistDTO): Promise<IArtistData | IArtistData[]> {
     const artist = await this.prisma.artist.create({
       data: {
         name: dto.name,
@@ -36,7 +37,10 @@ export class ArtistService {
     return prepareArtistResponse(artist);
   }
 
-  async updateArtistInfo(artistId: string, dto: ArtistDTO) {
+  async updateArtistInfo(
+    artistId: string,
+    dto: ArtistDTO,
+  ): Promise<IArtistData | IArtistData[]> {
     const response = await this.prisma.artist.findUnique({
       where: { id: artistId },
     });
