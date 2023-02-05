@@ -9,7 +9,6 @@
 
 ```
 git clone https://github.com/andrewkarev/nodejs2022Q4-service.git
-
 ```
 
 ## Switching branch to the **dev**
