@@ -8,13 +8,25 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/andrewkarev/nodejs2022Q4-service.git
+```
+
+## Switching branch to the **dev**
+
+```
+git checkout dev
 ```
 
 ## Installing NPM modules
 
 ```
 npm install
+```
+
+## Preparing **.env** file
+
+```
+.env.example -> .env
 ```
 
 ## Running application
