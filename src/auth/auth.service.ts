@@ -6,6 +6,7 @@ import * as argon from 'argon2';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDTO } from './dto';
 import { Tokens } from './types';
+import { prepareUserResponse } from '../common/helpers/prepareUserResponse';
 
 @Injectable()
 export class AuthService {
@@ -75,7 +76,7 @@ export class AuthService {
 
     await this.prepareResponse(user.id, user.login);
 
-    return;
+    return prepareUserResponse(user);
   }
 
   async login(dto: AuthDTO): Promise<Tokens> {
