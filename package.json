@@ -6,6 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "docker:scan:app": "docker scan andrewkarev/nodejs2022q4-service-app",
+    "docker:scan:db": "docker scan andrewkarev/nodejs2022q4-service-postgres",
     "start:migrate:dev": "prisma migrate deploy && npm run start:dev",
     "prisma:dev:deploy": "prisma migrate deploy",
     "prebuild": "rimraf dist",
