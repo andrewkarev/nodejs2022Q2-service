@@ -7,7 +7,6 @@ import { readFile } from 'fs/promises';
 import { parse } from 'yaml';
 
 import { AppModule } from './app.module';
-import { PORT } from './common/constants';
 
 async function bootstrap() {
   dotenv.config({ path: join(process.cwd(), '.env') });
@@ -15,7 +14,7 @@ async function bootstrap() {
   const document = await readFile(join(cwd(), 'doc', 'api.yaml'), 'utf-8');
 
   SwaggerModule.setup('doc', app, parse(document));
-  await app.listen(PORT);
+  await app.listen(process.env.PORT || 4000);
 }
 
 bootstrap();
