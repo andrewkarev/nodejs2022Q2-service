@@ -17,7 +17,9 @@ class UserData implements IUserData {
   }
 }
 
-export const prepareUserResponse = (data: User | User[]) => {
+export const prepareUserResponse = (
+  data: User | User[],
+): IUserData | IUserData[] => {
   if (Array.isArray(data)) {
     return data.map((item) => new UserData(item));
   } else {
