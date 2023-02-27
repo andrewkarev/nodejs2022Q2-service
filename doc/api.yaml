@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: /api
+  - url: /
 
 components:
   schemas:
@@ -117,7 +117,7 @@ security:
   - bearerAuth: []
 
 paths:
-  /login:
+  /auth/login:
     post:
       tags:
         - Login
@@ -154,11 +154,11 @@ paths:
                 description: JWT Token
         403:
           description: Incorrect login or password
-  /signup:
+  /auth/signup:
     post:
       tags:
         - Signup
-      security: [ ]
+      security: []
       summary: Signup
       description: Signup a user
       requestBody:
@@ -189,7 +189,37 @@ paths:
           description: Bad request
         409:
           description: Conflict. Login already exists
-  /users:
+
+  /auth/refresh:
+    post:
+      tags:
+        - Refresh
+      summary: Refresh
+      description: Refresh a tokens pair
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              title: example
+              properties:
+                refreshToken:
+                  type: string
+                  minLength: 3
+                  maxLength: 255
+                  description: refreshToken
+              required:
+                - refreshToken
+      responses:
+        200:
+          description: Token refresh succeed
+        401:
+          description: Missing refreshToken in the request body
+        403:
+          description: Refresh token is invalid or expired
+
+  /user:
     get:
       tags:
         - Users
@@ -239,7 +269,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /users/{userId}:
+  /user/{userId}:
     parameters:
       - name: userId
         in: path
@@ -334,7 +364,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: User not found
-  /tracks:
+  /track:
     get:
       tags:
         - Track
@@ -388,7 +418,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /tracks/{id}:
+  /track/{id}:
     parameters:
       - name: id
         in: path
@@ -492,7 +522,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Track was not found.
-  /albums:
+  /album:
     get:
       tags:
         - Album
@@ -544,7 +574,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /albums/{id}:
+  /album/{id}:
     parameters:
       - name: id
         in: path
@@ -621,7 +651,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Album was not found.
-  /artists:
+  /artist:
     get:
       tags:
         - Artist
@@ -668,7 +698,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /artists/{id}:
+  /artist/{id}:
     parameters:
       - name: id
         in: path
