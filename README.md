@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/andrewkarev/nodejs2022Q4-service.git
 ```
 
 ## Installing NPM modules
@@ -17,10 +17,22 @@ git clone {repository URL}
 npm install
 ```
 
+## Switching the branch
+
+```
+git checkout feature/service-part-3
+```
+
+## Prepare .env file
+
+```
+Replace .env.example with .env
+```
+
 ## Running application
 
 ```
-npm start
+docker compose up
 ```
 
 After starting the app on port (4000 as default) you can open
@@ -31,25 +43,13 @@ For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
-
-```
-npm run test
-```
-
-To run only one of all test suites
-
-```
-npm run test -- <path to suite>
-```
-
-To run all test with authorization
+To run all tests with authorization
 
 ```
 npm run test:auth
 ```
 
-To run only specific test suite with authorization
+To run only one of all test suites
 
 ```
 npm run test:auth -- <path to suite>
