@@ -9,8 +9,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './common/guards';
-import { LoggerMiddleware } from './common/utils/logging.middleware';
-import { LoggingModule } from './common/utils/logging.module';
+import { LoggerMiddleware } from './logging/logging.middleware';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [

@@ -7,7 +7,7 @@ import { readFile } from 'fs/promises';
 import { parse } from 'yaml';
 
 import { AppModule } from './app.module';
-import { LoggingService } from './common/utils/logging.service';
+import { LoggingService } from './logging/logging.service';
 import { HttpExceptionFilter } from './common/utils/http-exception.filter';
 import { createLogsFolder } from './common/helpers/createLogsFolder';
 

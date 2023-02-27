@@ -1,6 +1,6 @@
 import { LoggerService } from '@nestjs/common';
-import { LOGGING_LEVELS } from '../enums';
-import { writeLogs } from './write-logs';
+import { LOGGING_LEVELS } from '../common/enums';
+import { writeLogs } from '../common/utils/write-logs';
 
 import * as dotenv from 'dotenv';
 dotenv.config();
